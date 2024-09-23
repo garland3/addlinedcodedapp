@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Code Formatter with Line Numbers</title>
+    
+    <!-- Basic Styles -->
     <style>
         /* Reset and Base Styles */
         * {
@@ -13,9 +15,44 @@
 
         html, body {
             height: 100%;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
-            color: #333;
+            font-family: Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Light Theme Variables */
+        :root {
+            --background-color: #f0f2f5;
+            --text-color: #333;
+            --header-color: #4a90e2;
+            --button-bg-color: #4a90e2;
+            --button-hover-color: #357ab8;
+            --button-active-color: #2a5d8a;
+            --notification-success: #4BB543;
+            --notification-error: #FF3333;
+            --textarea-bg-color: #fafafa;
+            --textarea-focus-bg: #fff;
+            --textarea-output-bg: #f9f9f9;
+            --toggle-bg-color: #ccc;
+            --toggle-knob-color: #fff;
+        }
+
+        /* Dark Theme Variables */
+        body.dark-mode {
+            --background-color: #1e1e1e;
+            --text-color: #d4d4d4;
+            --header-color: #569cd6;
+            --button-bg-color: #569cd6;
+            --button-hover-color: #4b86d1;
+            --button-active-color: #3e6cb2;
+            --notification-success: #4BB543;
+            --notification-error: #FF3333;
+            --textarea-bg-color: #2d2d2d;
+            --textarea-focus-bg: #1e1e1e;
+            --textarea-output-bg: #252526;
+            --toggle-bg-color: #555;
+            --toggle-knob-color: #fff;
         }
 
         /* Container Setup */
@@ -29,13 +66,65 @@
 
         /* Header Styling */
         header {
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 10px;
         }
 
         header h1 {
             font-size: 2em;
-            color: #4a90e2;
+            color: var(--header-color);
+        }
+
+        /* Advanced Mode Toggle Switch */
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-switch input {
+            height: 0;
+            width: 0;
+            visibility: hidden;
+            position: absolute;
+        }
+
+        .toggle-switch label {
+            cursor: pointer;
+            text-indent: -9999px;
+            width: 50px;
+            height: 25px;
+            background: var(--toggle-bg-color);
+            display: block;
+            border-radius: 100px;
+            position: relative;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch label:after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 21px;
+            height: 21px;
+            background: var(--toggle-knob-color);
+            border-radius: 90px;
+            transition: 0.3s;
+        }
+
+        .toggle-switch input:checked + label {
+            background: var(--header-color);
+        }
+
+        .toggle-switch input:checked + label:after {
+            left: calc(100% - 2px);
+            transform: translateX(-100%);
+        }
+
+        .toggle-switch label:active:after {
+            width: 28px;
         }
 
         /* Textarea Containers */
@@ -43,10 +132,12 @@
             display: flex;
             flex-direction: column;
             flex: 1;
-            background-color: #fff;
+            background-color: var(--textarea-bg-color);
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             padding: 15px;
+            overflow: hidden;
+            position: relative;
         }
 
         .textarea-container label {
@@ -61,27 +152,37 @@
             width: 100%;
             height: 100%;
             padding: 12px 16px;
-            font-family: 'Fira Code', 'Courier New', monospace;
+            font-family: Arial, sans-serif;
             font-size: 14px;
             line-height: 1.5;
             border: 1px solid #ddd;
             border-radius: 6px;
             resize: none;
             overflow: auto;
-            background-color: #fafafa;
-            transition: border-color 0.3s;
+            background-color: var(--textarea-bg-color);
+            color: var(--text-color);
+            transition: border-color 0.3s, background-color 0.3s, color 0.3s;
         }
 
         textarea:focus {
-            border-color: #4a90e2;
+            border-color: var(--header-color);
             outline: none;
-            background-color: #fff;
+            background-color: var(--textarea-focus-bg);
         }
 
-        /* Output Textarea Specific Styling */
-        .output textarea {
-            background-color: #f9f9f9;
-            color: #333;
+        /* Output Area Styling */
+        .output {
+            background-color: var(--textarea-output-bg);
+            padding: 12px 16px;
+            overflow: auto;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--text-color);
+            background-color: var(--textarea-output-bg);
         }
 
         /* Button Styling */
@@ -89,6 +190,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            gap: 10px; /* Space between buttons */
         }
 
         button {
@@ -96,7 +198,7 @@
             font-size: 1em;
             font-weight: 600;
             color: #fff;
-            background-color: #4a90e2;
+            background-color: var(--button-bg-color);
             border: none;
             border-radius: 6px;
             cursor: pointer;
@@ -105,13 +207,26 @@
         }
 
         button:hover {
-            background-color: #357ab8;
+            background-color: var(--button-hover-color);
             transform: translateY(-2px);
         }
 
         button:active {
-            background-color: #2a5d8a;
+            background-color: var(--button-active-color);
             transform: translateY(0);
+        }
+
+        /* Download Button Specific Styling */
+        #downloadButton {
+            background-color: #28a745;
+        }
+
+        #downloadButton:hover {
+            background-color: #218838;
+        }
+
+        #downloadButton:active {
+            background-color: #1e7e34;
         }
 
         /* Notification Styling */
@@ -119,7 +234,7 @@
             position: fixed;
             bottom: 30px;
             right: 30px;
-            background-color: #4BB543;
+            background-color: var(--notification-success);
             color: #fff;
             padding: 12px 20px;
             border-radius: 6px;
@@ -128,11 +243,30 @@
             transform: translateY(20px);
             transition: opacity 0.5s, transform 0.5s;
             pointer-events: none;
+            z-index: 1000;
         }
 
         .notification.show {
             opacity: 1;
             transform: translateY(0);
+        }
+
+        /* Dark Mode Specific Notification Colors */
+        body.dark-mode .notification {
+            background-color: var(--notification-success);
+        }
+
+        /* Prism.js Customizations */
+        /* These styles will be applied when Prism.js is loaded in Advanced Mode */
+        pre[data-grammar] {
+            padding: 0;
+            margin: 0;
+        }
+
+        pre code {
+            display: block;
+            padding: 0;
+            margin: 0;
         }
 
         /* Responsive Design */
@@ -167,35 +301,47 @@
     <div class="container">
         <header>
             <h1>Code Formatter</h1>
+            <div class="toggle-switch">
+                <input type="checkbox" id="advancedModeToggle" aria-label="Toggle Advanced Mode">
+                <label for="advancedModeToggle">Advanced Mode</label>
+            </div>
         </header>
 
         <!-- Input Textarea -->
         <div class="textarea-container">
             <label for="inputCode">Paste your code here:</label>
-            <textarea id="inputCode" placeholder="Enter your code here..."></textarea>
+            <textarea id="inputCode" placeholder="Enter your code here..." aria-label="Input Code"></textarea>
         </div>
 
-        <!-- Copy Button -->
+        <!-- Buttons -->
         <div class="button-container">
-            <button id="copyButton">Copy Lined Code to Clipboard</button>
+            <button id="copyButton" aria-label="Copy Lined Code to Clipboard">Copy Lined Code</button>
+            <button id="downloadButton" aria-label="Download Lined Code">Download Lined Code</button>
         </div>
 
-        <!-- Output Textarea -->
+        <!-- Output Area -->
         <div class="textarea-container output">
             <label for="outputCode">Code with Line Numbers:</label>
-            <textarea id="outputCode" readonly></textarea>
+            <pre id="outputCode" class="output" aria-label="Output Code with Line Numbers"></pre>
         </div>
     </div>
 
     <!-- Notification -->
-    <div id="notification" class="notification">Copied to clipboard!</div>
+    <div id="notification" class="notification" role="alert" aria-live="assertive">Copied to clipboard!</div>
 
+    <!-- Basic JavaScript -->
     <script>
         // Get references to DOM elements
         const inputArea = document.getElementById('inputCode');
-        const outputArea = document.getElementById('outputCode');
+        const outputCode = document.getElementById('outputCode');
         const copyButton = document.getElementById('copyButton');
+        const downloadButton = document.getElementById('downloadButton');
         const notification = document.getElementById('notification');
+        const advancedModeToggle = document.getElementById('advancedModeToggle');
+
+        let isAdvancedMode = false;
+        let prismLoaded = false;
+        let firaCodeLoaded = false;
 
         /**
          * Adds line numbers to each line of the provided code.
@@ -217,20 +363,27 @@
         }
 
         /**
-         * Updates the output textarea with the numbered code.
+         * Updates the output area with the numbered code.
          */
         function updateOutput() {
             const inputText = inputArea.value;
             const numberedText = addLineNumbers(inputText);
-            outputArea.value = numberedText;
+            outputCode.textContent = numberedText;
+
+            if (isAdvancedMode && prismLoaded) {
+                Prism.highlightElement(outputCode);
+            }
         }
 
         /**
-         * Copies the content of the output textarea to the clipboard.
+         * Copies the content of the output area to the clipboard.
          */
         async function copyToClipboard() {
-            const numberedText = outputArea.value;
-            if (!numberedText) return;
+            const numberedText = addLineNumbers(inputArea.value);
+            if (!numberedText.trim()) {
+                showNotification('Nothing to copy!', 'error');
+                return;
+            }
 
             try {
                 await navigator.clipboard.writeText(numberedText);
@@ -257,21 +410,50 @@
                 if (successful) {
                     showNotification('Copied to clipboard!');
                 } else {
-                    alert('Failed to copy the code. Please try manually.');
+                    showNotification('Failed to copy the code.', 'error');
                 }
             } catch (err) {
-                alert('Browser does not support copying to clipboard.');
+                showNotification('Browser does not support copying to clipboard.', 'error');
             }
 
             document.body.removeChild(textarea);
         }
 
         /**
+         * Downloads the numbered code as a .txt file.
+         */
+        function downloadCode() {
+            const numberedText = addLineNumbers(inputArea.value);
+            if (!numberedText.trim()) {
+                showNotification('Nothing to download!', 'error');
+                return;
+            }
+
+            const blob = new Blob([numberedText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'numbered_code.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showNotification('Download started!');
+        }
+
+        /**
          * Displays a temporary notification.
          * @param {string} message - The message to display.
+         * @param {string} type - The type of notification ('success' or 'error').
          */
-        function showNotification(message) {
+        function showNotification(message, type = 'success') {
             notification.textContent = message;
+            if (type === 'success') {
+                notification.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--notification-success');
+            } else {
+                notification.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--notification-error');
+            }
             notification.classList.add('show');
 
             setTimeout(() => {
@@ -279,14 +461,132 @@
             }, 2000);
         }
 
+        /**
+         * Dynamically loads an external CSS file.
+         * @param {string} href - The URL of the CSS file.
+         * @returns {Promise} - Resolves when the CSS is loaded.
+         */
+        function loadCSS(href) {
+            return new Promise((resolve, reject) => {
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = href;
+                link.onload = () => resolve(link);
+                link.onerror = () => reject(new Error(`Failed to load CSS: ${href}`));
+                document.head.appendChild(link);
+            });
+        }
+
+        /**
+         * Dynamically loads an external JS file.
+         * @param {string} src - The URL of the JS file.
+         * @returns {Promise} - Resolves when the JS is loaded.
+         */
+        function loadJS(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.defer = true;
+                script.onload = () => resolve(script);
+                script.onerror = () => reject(new Error(`Failed to load JS: ${src}`));
+                document.head.appendChild(script);
+            });
+        }
+
+        /**
+         * Enables Advanced Mode by loading external resources and applying advanced features.
+         */
+        async function enableAdvancedMode() {
+            // Load Fira Code Font
+            if (!firaCodeLoaded) {
+                try {
+                    await loadCSS('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
+                    document.body.style.fontFamily = "'Fira Code', monospace";
+                    firaCodeLoaded = true;
+                } catch (err) {
+                    console.error(err);
+                    showNotification('Failed to load advanced fonts.', 'error');
+                }
+            }
+
+            // Load Prism.js CSS and JS
+            if (!prismLoaded) {
+                try {
+                    await loadCSS('https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css');
+                    await loadJS('https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js');
+                    // Load additional languages as needed
+                    await loadJS('https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-clike.min.js');
+                    await loadJS('https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js');
+                    // Add more languages here if needed
+                    prismLoaded = true;
+                } catch (err) {
+                    console.error(err);
+                    showNotification('Failed to load syntax highlighting.', 'error');
+                }
+            }
+
+            // Apply syntax highlighting
+            if (prismLoaded) {
+                Prism.highlightElement(outputCode);
+            }
+
+            // Enable Dark Mode if already toggled
+            if (advancedModeToggle.checked) {
+                document.body.classList.add('dark-mode');
+                // Load dark theme for Prism.js
+                await loadCSS('https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css');
+            }
+        }
+
+        /**
+         * Disables Advanced Mode by removing external resources and reverting to basic features.
+         */
+        function disableAdvancedMode() {
+            // Revert font to default
+            if (firaCodeLoaded) {
+                document.body.style.fontFamily = 'Arial, sans-serif';
+            }
+
+            // Remove Prism.js CSS
+            const prismCSS = Array.from(document.querySelectorAll('link[rel="stylesheet"]')).find(link => link.href.includes('prism.min.css') || link.href.includes('prism-okaidia.min.css'));
+            if (prismCSS) {
+                prismCSS.parentNode.removeChild(prismCSS);
+            }
+
+            // Remove Prism.js scripts
+            const prismScripts = Array.from(document.querySelectorAll('script[src]')).filter(script => script.src.includes('prism.min.js') || script.src.includes('prism-clike.min.js') || script.src.includes('prism-javascript.min.js'));
+            prismScripts.forEach(script => script.parentNode.removeChild(script));
+
+            prismLoaded = false;
+            firaCodeLoaded = false;
+
+            // Remove dark mode class
+            document.body.classList.remove('dark-mode');
+
+            // Update output without syntax highlighting
+            updateOutput();
+        }
+
+        /**
+         * Toggles Advanced Mode on or off.
+         */
+        function toggleAdvancedMode() {
+            isAdvancedMode = advancedModeToggle.checked;
+            if (isAdvancedMode) {
+                enableAdvancedMode();
+            } else {
+                disableAdvancedMode();
+            }
+        }
+
+        // Event Listeners
+        inputArea.addEventListener('input', updateOutput);
+        copyButton.addEventListener('click', copyToClipboard);
+        downloadButton.addEventListener('click', downloadCode);
+        advancedModeToggle.addEventListener('change', toggleAdvancedMode);
+
         // Initialize output on page load
         updateOutput();
-
-        // Listen for input events to update output in real-time
-        inputArea.addEventListener('input', updateOutput);
-
-        // Listen for click events on the copy button
-        copyButton.addEventListener('click', copyToClipboard);
     </script>
 </body>
 </html>
